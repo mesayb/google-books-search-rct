@@ -1,6 +1,7 @@
 import React from "react";
 
-function Nav() {
+function Nav(props) {
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <a className="navbar-brand" href="/">
@@ -9,10 +10,10 @@ function Nav() {
 
       <ul className="navbar-nav">
         <li className="nav-item">
-          <a className="nav-link" href="#">Search</a>
+          <button className="btn-primary" value="false" {...props} >Search</button>
         </li>
         <li className="nav-item">
-          <a className="nav-link" href="#">Saved</a>
+          <button className="btn-danger" value='true' {...props}>Saved</button>
         </li>
       </ul>
     </nav>

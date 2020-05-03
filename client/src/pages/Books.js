@@ -1,78 +1,148 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import Jumbotron from "../components/Jumbotron";
 import BookCard from "../components/BookCard";
 import DeleteBtn from "../components/DeleteBtn";
 import { Col, Row, Container } from "../components/Grid";
 import { List, ListItem } from "../components/List";
 import { Input, TextArea, FormBtn } from "../components/Form";
+import API from "../utils/API";
+import Nav from "../components/Nav";
 
 function Books() {
   // Initialize books as an empty array
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState({
+    title: 'People Skills',
+    result: [],
+    saved: false
+  });
 
-  useEffect(() => {
-    loadBooks();
-  }, []);
+  // state = {
+  //   search: "",
+  //   breeds: [],
+  //   results: [],
+  //   error: ""
+  // };
 
-  function loadBooks() {
-    // Add code here to get all books from the database and store them using setBooks
+  // When the component mounts, get a list of all available base breeds and update this.state.breeds
+  React.useEffect(() => {
+    API.searchBook(books.title)
+      .then(res => {
+        const result = res.data.items.map(item => {
+          return {
+            id: item.id,
+            authors: item.volumeInfo.authors,
+            description: item.volumeInfo.description,
+            image: item.volumeInfo.imageLinks.thumbnail,
+            link: item.volumeInfo.previewLink,
+            title: item.volumeInfo.title,
+          }
+        })
+        
+        setBooks({
+          ...books,
+        result: result,
+        saved: false
+      })
+    })
+      .catch(err => console.log(err));
+  }, [])
 
-  }
+
+
+  const handleInputChange = event => {
+    setBooks(
+      {
+        ...books,
+        title: event.target.value
+      })
+  };
+
+  const handleFormSubmit = event => {
+    event.preventDefault();
+
+    API.searchBook(books.title)
+      .then(res => {
+        
+        const result = res.data.items.map(item => {
+          return {
+            id: item.id,
+            authors: item.volumeInfo.authors,
+            description: item.volumeInfo.description,
+            image: item.volumeInfo.imageLinks.thumbnail,
+            link: item.volumeInfo.previewLink,
+            title: item.volumeInfo.title,
+          }
+        })
+        console.log("result1 = ", result)
+        setBooks({
+          ...books,
+          result: result,
+          saved: false
+       
+    });
+
+        // //reset the search box
+        // setBooks({
+        //   authors:'',
+        //   description:'',
+        //   image:'',
+        //   link:'',
+        //   title:''
+        // });
+
+        console.log(JSON.stringify(books))
+      })
+      .catch(err => console.log(err));
+  };
+
+  const handleNavChange = event => {
+    setBooks(
+      {
+        ...books,
+        saved: event.target.value
+      })
+    console.log("mesay = ", books)
+  };
+
+  // useEffect(() => {
+  //   loadBooks();
+  // }, []);
+
+  // function loadBooks() {
+  //   // Add code here to get all books from the database and store them using setBooks
+
+  // }
 
   return (
-    <Container fluid>
-      <Row>
-        <Col size="md-12">
-          <Jumbotron>
-            <h1>Google Books Search</h1>
-            <h4>Search for and save Books of Interest</h4>
-          </Jumbotron>
-          {/* <form>
-            <Input name="title" placeholder="Title (required)" />
-            <Input name="author" placeholder="Author (required)" />
-            <TextArea name="synopsis" placeholder="Synopsis (Optional)" />
-            <FormBtn>Submit Book</FormBtn>
-          </form> */}
-        </Col>
-        {/* <Col size="md-6 sm-12">
+    <Fragment>
+      <Nav onClick={handleNavChange} />
+      <Container fluid>
+        <Row>
+          <Col size="md-12">
             <Jumbotron>
-              <h1>Books On My List</h1>
+              <h1>Google Books Search</h1>
+              <h4>Search for and save Books of Interest</h4>
             </Jumbotron>
-            {books.length ? (
-              <List>
-                {books.map(book => (
-                  <ListItem key={book._id}>
-                    <a href={"/books/" + book._id}>
-                      <strong>
-                        {book.title} by {book.author}
-                      </strong>
-                    </a>
-                    <DeleteBtn />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <h3>No Results to Display</h3>
-            )}
-          </Col> */}
-      </Row>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col size="md-12">
+        <Row>
+          <Col size="md-12">
+            <h5>Book Search</h5>
+            <h3>{books.title}</h3>
+            <p>Book</p>
 
-          {/* <div className="container"> */}
-          <h5>Book Search</h5>
-          <p>Book</p>
-            <input className="form-control" id="anythingSearch" type="text" placeholder="Type something to search list items" />
-            <FormBtn>Search</FormBtn>
-          {/* </div> */}
+            <Input onChange={handleInputChange}
+              value={books.title} placeholder="Type something to search Google books library" ></Input>
+            <FormBtn onClick={handleFormSubmit}>Search</FormBtn>
+          </Col>
+        </Row>
 
-        </Col>
-      </Row>
-    
-      <BookCard />
-   
-    </Container>
+        <BookCard result={books.result} />
+
+      </Container>
+    </Fragment>
+
   );
 }
 
