@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import Jumbotron from "../components/Jumbotron";
 import BookCard from "../components/BookCard";
-import DeleteBtn from "../components/DeleteBtn";
 import { Col, Row, Container } from "../components/Grid";
 import { List, ListItem } from "../components/List";
 import { Input, TextArea, FormBtn } from "../components/Form";
