@@ -1,5 +1,7 @@
 const router = require("express").Router();
+const API = require("../../")
 const googleBooksController = require("../../controllers/googleBooksController");
+
 
 // Matches with "/api/books"
 router.route("/")
@@ -10,7 +12,6 @@ router.route("/")
 router
   .route("/:id")
   .get(googleBooksController.findById)
-  .put(googleBooksController.update)
   .delete(googleBooksController.remove);
 
 module.exports = router;
