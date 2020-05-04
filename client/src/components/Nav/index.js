@@ -9,10 +9,10 @@ function Nav(props) {
       </a>
 
       <ul className="navbar-nav">
-        <li className="nav-item">
-          <button className="btn-primary" value="false" {...props} >Search</button>
+        <li className="nav-item" key='1'>
+          <button className="btn-primary" value='false' {...props} >Search</button>
         </li>
-        <li className="nav-item">
+        <li className="nav-item" key='2'>
           <button className="btn-danger" value='true' {...props}>Saved</button>
         </li>
       </ul>

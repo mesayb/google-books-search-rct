@@ -7,29 +7,25 @@ import { List, ListItem } from "../components/List";
 import { Input, TextArea, FormBtn } from "../components/Form";
 import API from "../utils/API";
 import Nav from "../components/Nav";
+import axios from 'axios'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Books() {
   // Initialize books as an empty array
   const [books, setBooks] = useState({
-    title: 'People Skills',
+    title: '',
     result: [],
-    saved: false
+    saved: 'false'
   });
 
-  // state = {
-  //   search: "",
-  //   breeds: [],
-  //   results: [],
-  //   error: ""
-  // };
 
-  // When the component mounts, get a list of all available base breeds and update this.state.breeds
   React.useEffect(() => {
     API.searchBook(books.title)
       .then(res => {
         const result = res.data.items.map(item => {
           return {
-            id: item.id,
+            gid: item.id,
             authors: item.volumeInfo.authors,
             description: item.volumeInfo.description,
             image: item.volumeInfo.imageLinks.thumbnail,
@@ -37,13 +33,13 @@ function Books() {
             title: item.volumeInfo.title,
           }
         })
-        
+
         setBooks({
           ...books,
-        result: result,
-        saved: false
+          result: result,
+          saved: 'false'
+        })
       })
-    })
       .catch(err => console.log(err));
   }, [])
 
@@ -62,10 +58,9 @@ function Books() {
 
     API.searchBook(books.title)
       .then(res => {
-        
         const result = res.data.items.map(item => {
           return {
-            id: item.id,
+            gid: item.id,
             authors: item.volumeInfo.authors,
             description: item.volumeInfo.description,
             image: item.volumeInfo.imageLinks.thumbnail,
@@ -73,50 +68,99 @@ function Books() {
             title: item.volumeInfo.title,
           }
         })
-        console.log("result1 = ", result)
+
+        toast.success(`Google Books search result for  - ${books.title}`);
         setBooks({
           ...books,
           result: result,
-          saved: false
-       
-    });
+          saved: 'false'
 
-        // //reset the search box
-        // setBooks({
-        //   authors:'',
-        //   description:'',
-        //   image:'',
-        //   link:'',
-        //   title:''
-        // });
-
-        console.log(JSON.stringify(books))
+        });
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err)
+        toast.success(`No Data  - ${books.title}`);
+      });
   };
 
   const handleNavChange = event => {
-    setBooks(
-      {
-        ...books,
-        saved: event.target.value
-      })
-    console.log("mesay = ", books)
+    const currentNav = event.target.value;
+    if (currentNav === 'true') {
+      getBooksFromDB();
+    } else {
+      setBooks(
+        {
+          ...books,
+          title: '',
+          result: [],
+          saved: 'false'
+        })
+
+    }
+
+
   };
 
-  // useEffect(() => {
-  //   loadBooks();
-  // }, []);
+  const saveBookToDB = (event) => {
+    const data = books.result.filter(book => book.gid === event.target.id);
 
-  // function loadBooks() {
-  //   // Add code here to get all books from the database and store them using setBooks
+    API.saveBook(data[0]).then(res => {
+      toast.success(`Saved - ${data[0].title}`);
+    })
+      .catch(err => {
+        console.log(err);
+        toast.error(`Failed to save - ${data[0].title}`);
+      });
+  }
 
-  // }
+  const getBooksFromDB = (event) => {
 
+    API.getBooks().then(res => {
+      const result = res.data.map(item => {
+        return {
+          gid: item.gid,
+          authors: item.authors,
+          description: item.description,
+          image: item.image,
+          link: item.link,
+          title: item.title,
+          id: item._id
+        }
+      })
+      toast.success("Here are your saved Books");
+      setBooks({
+        ...books,
+        result: result,
+        saved: 'true'
+
+      })
+    })
+      .catch(err => {
+        toast.error("No Saved book available");
+        console.log(err)
+      });
+  }
+
+  const deleteBookFromDB = (event) => {
+    const gid = event.target.id;
+    const data = books.result.filter(book => book.gid === gid);
+    const id = data[0].id
+    API.deleteBook(id).then(res => {
+      toast.success(`Deleted - ${data[0].title}`);
+      getBooksFromDB();
+    })
+      .catch(err => {
+        console.log(err);
+
+        toast.error(`FAILED to Delete - ${data[0].title}`);
+
+      });
+  }
   return (
     <Fragment>
       <Nav onClick={handleNavChange} />
       <Container fluid>
+        <ToastContainer />
         <Row>
           <Col size="md-12">
             <Jumbotron>
@@ -138,7 +182,7 @@ function Books() {
           </Col>
         </Row>
 
-        <BookCard result={books.result} />
+        {books.saved === 'true' ? <BookCard result={books.result} deleteBookFromDB={deleteBookFromDB} saved={books.saved} /> : <BookCard result={books.result} saveBookToDB={saveBookToDB} saved={books.saved} />}
 
       </Container>
     </Fragment>

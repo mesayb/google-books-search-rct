@@ -1,10 +1,40 @@
 
 import axios from "axios";
-const APIKEY = "AIzaSyAcwRTF8ESYkIBfTh2652IxkQ7AAVD_2T0";
+require('dotenv').config();
+const APIKEY = process.env.REACT_APP_GOOGLE_APIKEY;
 
 export default {
+  //search from Google books API
   searchBook: function(bookTitle) {
+
+ 
+ console.log('key - '+APIKEY)
+    console.log("KEY = "+APIKEY)
     return axios.get(`https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${APIKEY}`);
+  },
+
+  //API to save and retreive data from MongoDB
+    saveBook: function(data) {
+    return axios({
+    method: 'POST',
+    url:'/api/books',
+    data: data
+    });
+  },
+
+  getBooks: function() {
+    return axios({
+    method: 'GET',
+    url:'/api/books',
+    });
+  },
+
+  deleteBook: function(id) {
+    console.log("id = "+id)
+    return axios({
+    method: 'DELETE',
+    url:`/api/books/${id}`,
+    });
   },
 };
 

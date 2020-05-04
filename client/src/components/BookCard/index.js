@@ -1,14 +1,16 @@
 import React, { Fragment } from "react";
 
 
-function BookCard({ result }) {
-    console.log("hey = " + JSON.stringify(result))
+function BookCard(props) {
+    // { result , saveBookToDB }
+console.log("props = " , props)
 
     return (
         <Fragment>
             <div className="container border border-primary rounded-lg">
-                <p className="pt-3 border-bottom "><strong>Saved Books</strong></p>
-                {result.map((res,index) => {
+                <p className="pt-3 border-bottom "><strong> {props.saved === 'true' ? 'Saved Books' : 'Book Search'} </strong></p>
+                {props.result.map((res, index) => {
+                    console.log("id = " , res.gid)
                     return (
                         <div className="container border border-primary rounded-lg mb-3">
                             <div className="row pt-3 pl-3 pr-3">
@@ -22,9 +24,11 @@ function BookCard({ result }) {
                                     <a href={res.link} target="_blank"><button style={{ float: "right" }} className="btn btn-dark ">
                                         View
     </button></a>
-                                    <button style={{ float: "right" }} className="btn btn-success ml-5 mt-2" id={res.id}>
+                                    {props.saved === 'true' ?  (<button style={{ float: "right" }} className="btn btn-danger ml-5 mt-2" id = {res.gid} onClick={props.deleteBookFromDB} >
+                                            Delete
+    </button>) : (<button style={{ float: "right" }} className="btn btn-success ml-5 mt-2" id={res.gid} onClick={props.saveBookToDB} >
                                         Save
-    </button>
+    </button>) }
                                 </div>
 
                             </div>
