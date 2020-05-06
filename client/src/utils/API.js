@@ -1,7 +1,7 @@
 
 import axios from "axios";
 require('dotenv').config();
-const APIKEY = process.env.REACT_APP_GOOGLE_APIKEY;
+const APIKEY = `${process.env.REACT_APP_GOOGLE_APIKEY}`;
 
 export default {
   //search from Google books API
